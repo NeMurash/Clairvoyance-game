@@ -145,7 +145,7 @@ int main() {
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					// Selecting a card
-					if (event.button.button == 1) {
+					if (event.button.button == 1 && gameState == STATE_CHOOSING) {
 						for (int i=0; i<5; i++) {
 							bool hoveringOver = mouseOverRect(
 								mousePosition,
