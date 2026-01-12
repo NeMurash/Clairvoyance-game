@@ -48,6 +48,7 @@ struct Card {
 int main() {
 	// Boilerplate
     bool windowShouldClose = false;
+
     SDL_Window* window;
     SDL_Renderer* renderer;
 
@@ -146,8 +147,6 @@ int main() {
 							break;
 						default: break;
 					}
-					break;
-				case SDL_EVENT_MOUSE_MOTION:
 					break;
 				default: break;
 			}
