@@ -110,21 +110,13 @@ int main() {
 	playerCards[2].texture = waveCardTexture  ;
 	playerCards[3].texture = squareCardTexture;
 	playerCards[4].texture = starCardTexture  ;
-	playerCards[0].position = STWCoords((SDL_FPoint){0, 2});
-	playerCards[1].position = STWCoords((SDL_FPoint){0, 2});
-	playerCards[2].position = STWCoords((SDL_FPoint){0, 2});
-	playerCards[3].position = STWCoords((SDL_FPoint){0, 2});
-	playerCards[4].position = STWCoords((SDL_FPoint){0, 2});
-	playerCards[0].targetPosition = STWCoords((SDL_FPoint){-2*PCARD_OFF_X, PCARD_REG_Y});
-	playerCards[1].targetPosition = STWCoords((SDL_FPoint){-1*PCARD_OFF_X, PCARD_REG_Y});
-	playerCards[2].targetPosition = STWCoords((SDL_FPoint){ 0*PCARD_OFF_X, PCARD_REG_Y});
-	playerCards[3].targetPosition = STWCoords((SDL_FPoint){ 1*PCARD_OFF_X, PCARD_REG_Y});
-	playerCards[4].targetPosition = STWCoords((SDL_FPoint){ 2*PCARD_OFF_X, PCARD_REG_Y});
 	for (int i=0; i<5; i++) {
+		playerCards[i].position = STWCoords((SDL_FPoint){0, 2});
+		playerCards[i].targetPosition = STWCoords((SDL_FPoint){ (i - 2) * PCARD_OFF_X, PCARD_REG_Y});
 		playerCards[i].rect.w = CARD_W;
 		playerCards[i].rect.h = CARD_H;
-		playerCards[i].rect.x = playerCards[i].position.x - CARD_W/2;
-		playerCards[i].rect.y = playerCards[i].position.y - CARD_H/2;
+		playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
+		playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 	}
 	
     int lastTicks = SDL_GetTicks();
@@ -132,8 +124,8 @@ int main() {
 	SDL_FPoint mousePosition = {0, 0};
     while (!windowShouldClose) {
         // Limit the FPS I think
-		if (SDL_GetTicks() - lastTicks < 1000/TARGET_FPS) continue;
-		deltaTime = (SDL_GetTicks() - lastTicks)/1000.0;
+		if (SDL_GetTicks() - lastTicks < 1000 / TARGET_FPS) continue;
+		deltaTime = (SDL_GetTicks() - lastTicks) / 1000.0;
 		lastTicks = SDL_GetTicks();
 
         // Handle the events
@@ -159,7 +151,7 @@ int main() {
 								mousePosition,
 							    (SDL_FRect) {
 								    playerCards[i].rect.x,
-								    STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y - CARD_H/2,
+								    STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y - CARD_H / 2,
 								    CARD_W,
 								    CARD_H
 								}
@@ -189,7 +181,7 @@ int main() {
 						mousePosition,
 						(SDL_FRect) {
 							playerCards[i].rect.x,
-							STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y - CARD_H/2,
+							STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y - CARD_H / 2,
 							CARD_W,
 							CARD_H
 						}
@@ -206,8 +198,8 @@ int main() {
 		if (SDL_GetTicks() > START_DELAY) {
 			for (int i=0; i<5; i++) {
 				playerCards[i].position = lerpV(playerCards[i].position, playerCards[i].targetPosition, 0.2);
-				playerCards[i].rect.x = playerCards[i].position.x - CARD_W/2;
-				playerCards[i].rect.y = playerCards[i].position.y - CARD_H/2;
+				playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
+				playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 			}
 		}
 
