@@ -148,11 +148,30 @@ int main() {
 						default: break;
 					}
 					break;
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+					if (event.button.button == 1) {
+						for (int i=0; i<5; i++) {
+							bool hoveringOver = mouseOverRect(
+								mousePosition,
+							    (SDL_FRect) {
+								    playerCards[i].rect.x,
+								    STWCoords((SDL_FPoint){0.0, 0.5}).y - CARD_H/2,
+								    CARD_W,
+								    CARD_H
+								}
+							);
+							if (hoveringOver) {
+								gameState = STATE_ANSWER;
+								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.5}).y;
+							}
+						}
+					}
+					break;
 				default: break;
 			}
         }
 
-		SDL_MouseButtonFlags mouseFlags = SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+		SDL_MouseButtonFlags mouseFlags __attribute__((unused)) = SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
 
 		// Game state handling
 		switch (gameState) {
@@ -161,19 +180,17 @@ int main() {
 				break;
 			case STATE_CHOOSING:
 				for (int i=0; i<5; i++) {
-					SDL_FRect hitbox = {
-						playerCards[i].rect.x,
-						STWCoords((SDL_FPoint){0.0, 0.5}).y - CARD_H/2,
-						CARD_W,
-						CARD_H
-					};
-					bool hoveringOver = mouseOverRect(mousePosition, hitbox);
+					bool hoveringOver = mouseOverRect(
+						mousePosition,
+						(SDL_FRect) {
+							playerCards[i].rect.x,
+							STWCoords((SDL_FPoint){0.0, 0.5}).y - CARD_H/2,
+							CARD_W,
+							CARD_H
+						}
+					);
 					if (hoveringOver) playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.4}).y;
 					else playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.5}).y;
-					if (hoveringOver && mouseFlags&1) {
-						gameState = STATE_ANSWER;
-						playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.5}).y;
-					}
 				}
 				break;
 			case STATE_ANSWER:
