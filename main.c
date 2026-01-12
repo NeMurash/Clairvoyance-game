@@ -6,6 +6,9 @@
 #define SCREEN_H 720
 #define CARD_W 168
 #define CARD_H 240
+#define PCARD_OFF_X 0.35
+#define PCARD_REG_Y 0.5
+#define PCARD_HOV_Y 0.45
 #define START_DELAY 500 // milliseconds
 #define TARGET_FPS 180
 
@@ -112,11 +115,11 @@ int main() {
 	playerCards[2].position = STWCoords((SDL_FPoint){0, 2});
 	playerCards[3].position = STWCoords((SDL_FPoint){0, 2});
 	playerCards[4].position = STWCoords((SDL_FPoint){0, 2});
-	playerCards[0].targetPosition = STWCoords((SDL_FPoint){-0.70, 0.50});
-	playerCards[1].targetPosition = STWCoords((SDL_FPoint){-0.35, 0.50});
-	playerCards[2].targetPosition = STWCoords((SDL_FPoint){ 0.00, 0.50});
-	playerCards[3].targetPosition = STWCoords((SDL_FPoint){ 0.35, 0.50});
-	playerCards[4].targetPosition = STWCoords((SDL_FPoint){ 0.70, 0.50});
+	playerCards[0].targetPosition = STWCoords((SDL_FPoint){-2*PCARD_OFF_X, PCARD_REG_Y});
+	playerCards[1].targetPosition = STWCoords((SDL_FPoint){-1*PCARD_OFF_X, PCARD_REG_Y});
+	playerCards[2].targetPosition = STWCoords((SDL_FPoint){ 0*PCARD_OFF_X, PCARD_REG_Y});
+	playerCards[3].targetPosition = STWCoords((SDL_FPoint){ 1*PCARD_OFF_X, PCARD_REG_Y});
+	playerCards[4].targetPosition = STWCoords((SDL_FPoint){ 2*PCARD_OFF_X, PCARD_REG_Y});
 	for (int i=0; i<5; i++) {
 		playerCards[i].rect.w = CARD_W;
 		playerCards[i].rect.h = CARD_H;
@@ -149,20 +152,21 @@ int main() {
 					}
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+					// Selecting a card
 					if (event.button.button == 1) {
 						for (int i=0; i<5; i++) {
 							bool hoveringOver = mouseOverRect(
 								mousePosition,
 							    (SDL_FRect) {
 								    playerCards[i].rect.x,
-								    STWCoords((SDL_FPoint){0.0, 0.5}).y - CARD_H/2,
+								    STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y - CARD_H/2,
 								    CARD_W,
 								    CARD_H
 								}
 							);
 							if (hoveringOver) {
 								gameState = STATE_ANSWER;
-								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.5}).y;
+								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y;
 							}
 						}
 					}
@@ -179,18 +183,19 @@ int main() {
 				if (SDL_GetTicks() > START_DELAY) gameState = STATE_CHOOSING;
 				break;
 			case STATE_CHOOSING:
+				// Card hover effect
 				for (int i=0; i<5; i++) {
 					bool hoveringOver = mouseOverRect(
 						mousePosition,
 						(SDL_FRect) {
 							playerCards[i].rect.x,
-							STWCoords((SDL_FPoint){0.0, 0.5}).y - CARD_H/2,
+							STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y - CARD_H/2,
 							CARD_W,
 							CARD_H
 						}
 					);
-					if (hoveringOver) playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.4}).y;
-					else playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, 0.5}).y;
+					if (hoveringOver) playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_HOV_Y}).y;
+					else playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}).y;
 				}
 				break;
 			case STATE_ANSWER:
