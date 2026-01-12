@@ -112,7 +112,7 @@ int main() {
 	playerCards[4].texture = starCardTexture  ;
 	for (int i=0; i<5; i++) {
 		playerCards[i].position = STWCoords((SDL_FPoint){0, 2});
-		playerCards[i].targetPosition = STWCoords((SDL_FPoint){ (i - 2) * PCARD_OFF_X, PCARD_REG_Y});
+		playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y});
 		playerCards[i].rect.w = CARD_W;
 		playerCards[i].rect.h = CARD_H;
 		playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
