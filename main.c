@@ -77,7 +77,7 @@ int main() {
 		STATE_ANSWER
 	} gameState = STATE_STARTING;
 
-	SDL_Surface* bgSurface = SDL_LoadBMP("textures/bg.bmp");
+	SDL_Surface* bgSurface = SDL_LoadPNG("textures/bg.png");
 	SDL_Texture* bgTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
 	if (!bgSurface || !bgTexture) return -1;
 	SDL_DestroySurface(bgSurface);
