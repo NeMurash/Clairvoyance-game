@@ -1,23 +1,14 @@
 #include "misc-utils.h"
 #include <SDL3/SDL.h>
 
-#ifndef SCREEN_W
-#define SCREEN_W 1280
-#endif
-#ifndef SCREEN_H
-#define SCREEN_H 720
-#endif
-
-SDL_FPoint STWCoords(SDL_FPoint point) {
-	return (SDL_FPoint){
-		(point.x - (-1)) / (1 - (-1)) * SCREEN_W,
-		(point.y - (-1)) / (1 - (-1)) * SCREEN_H,
-	};
+float mapNumber(float n, float min0, float max0, float min1, float max1) {
+	return (n - min0) / (max0 - min0) * (max1 - min1) + min1;
 }
-SDL_FPoint WTSCoords(SDL_FPoint point) {
+
+SDL_FPoint STWCoords(SDL_FPoint point, float screenWidth, float screenHeight) {
 	return (SDL_FPoint){
-		(point.x) / SCREEN_W * (1 + 1) - 1,
-		(point.y) / SCREEN_H * (1 + 1) - 1,
+		(point.x + 1) / 2 * screenWidth,
+		(point.y + 1) / 2 * screenHeight
 	};
 }
 
