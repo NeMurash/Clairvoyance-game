@@ -5,8 +5,8 @@
 // Map a number that falls between min0 and max0 to a number that falls between min1 and max1
 float mapNumber(float n, float min0, float max0, float min1, float max1);
 
-// Screen To World Coordinates Mapping ((-1, 1), (-1, 1)) -> ((0, 1280), (0, 720))
-SDL_FPoint STWCoords(SDL_FPoint point, float screenWidth, float screenHeight);
+// Screen To World Coordinates Mapping ((-1, 1), (-1, 1)) -> ((0, minmax.x), (0, minmax.y))
+SDL_FPoint STWCoords(SDL_FPoint point, SDL_FPoint minmax);
 
 // Linear interpolation of a vector (https://en.wikipedia.org/wiki/Linear_interpolation)
 SDL_FPoint lerpV(SDL_FPoint v0, SDL_FPoint v1, float t);

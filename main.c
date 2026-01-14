@@ -7,6 +7,7 @@
 // Pixels
 #define SCREEN_W 1280
 #define SCREEN_H 720
+#define SCREEN_RES (SDL_FPoint){SCREEN_W, SCREEN_H}
 #define CARD_W   168
 #define CARD_H   240
 
@@ -65,8 +66,8 @@ int main() {
 
 	struct Card answerCard = {
 		nullCardTexture,
-		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_W, SCREEN_H),
-		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_W, SCREEN_H),
+		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_RES),
+		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_RES),
 		(SDL_FRect){0, 0, CARD_W, CARD_H}
 	};
 	answerCard.rect.x = answerCard.position.x - CARD_W / 2;
@@ -96,12 +97,12 @@ int main() {
 
 	struct Card playerCards[5];
 	playerCards[0].texture = circleCardTexture;
-	playerCards[1].texture = crossCardTexture ;
-	playerCards[2].texture = waveCardTexture  ;
+	playerCards[1].texture = crossCardTexture;
+	playerCards[2].texture = waveCardTexture;
 	playerCards[3].texture = squareCardTexture;
-	playerCards[4].texture = starCardTexture  ;
+	playerCards[4].texture = starCardTexture;
 	for (int i=0; i<5; i++) {
-		playerCards[i].position = STWCoords((SDL_FPoint){0, 2}, SCREEN_W, SCREEN_H);
+		playerCards[i].position = STWCoords((SDL_FPoint){0, 2}, SCREEN_RES);
 		playerCards[i].targetPosition = playerCards[i].position;
 		playerCards[i].rect.w = CARD_W;
 		playerCards[i].rect.h = CARD_H;
@@ -141,14 +142,14 @@ int main() {
 								mousePosition,
 							    (SDL_FRect) {
 								    playerCards[i].rect.x,
-								    STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_W, SCREEN_H).y - CARD_H / 2,
+								    STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y - CARD_H / 2,
 								    CARD_W,
 								    CARD_H
 								}
 							);
 							if (hoveringOver) {
 								gameState = STATE_ANSWER;
-								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_W, SCREEN_H).y;
+								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
 							}
 						}
 					}
@@ -165,8 +166,8 @@ int main() {
 				Uint64 ticks = SDL_GetTicks();
 				if (ticks > PCARDS_DELAY)
 					for (int i=0; i<5; i++)
-						playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y}, SCREEN_W, SCREEN_H);
-				if (ticks > NULLC_DELAY) answerCard.targetPosition = STWCoords((SDL_FPoint){0, NULLC_REG_Y}, SCREEN_W, SCREEN_H);
+						playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y}, SCREEN_RES);
+				if (ticks > NULLC_DELAY) answerCard.targetPosition = STWCoords((SDL_FPoint){0, NULLC_REG_Y}, SCREEN_RES);
 				if (ticks > START_DELAY) gameState = STATE_CHOOSING;
 				break;
 			case STATE_CHOOSING:
@@ -176,13 +177,13 @@ int main() {
 						mousePosition,
 						(SDL_FRect) {
 							playerCards[i].rect.x,
-							STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_W, SCREEN_H).y - CARD_H / 2,
+							STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y - CARD_H / 2,
 							CARD_W,
 							CARD_H
 						}
 					);
-					if (hoveringOver) playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_HOV_Y}, SCREEN_W, SCREEN_H).y;
-					else playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_W, SCREEN_H).y;
+					if (hoveringOver) playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_HOV_Y}, SCREEN_RES).y;
+					else playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
 				}
 				break;
 			case STATE_ANSWER:

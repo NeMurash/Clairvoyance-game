@@ -5,10 +5,10 @@ float mapNumber(float n, float min0, float max0, float min1, float max1) {
 	return (n - min0) / (max0 - min0) * (max1 - min1) + min1;
 }
 
-SDL_FPoint STWCoords(SDL_FPoint point, float screenWidth, float screenHeight) {
+SDL_FPoint STWCoords(SDL_FPoint point, SDL_FPoint minmax) {
 	return (SDL_FPoint){
-		(point.x + 1) / 2 * screenWidth,
-		(point.y + 1) / 2 * screenHeight
+		(point.x + 1) / 2 * minmax.x,
+		(point.y + 1) / 2 * minmax.y
 	};
 }
 
