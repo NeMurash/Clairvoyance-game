@@ -13,7 +13,7 @@
 // -1 -> 1
 #define PCARD_OFF_X  0.35
 #define PCARD_REG_Y  0.50
-#define PCARD_HOV_Y  0.45
+#define PCARD_HOV_Y  0.40
 #define NULLC_REG_Y -0.50
 
 // Milliseconds
@@ -63,14 +63,14 @@ int main() {
 	if (!nullCardSurface   || !nullCardTexture  ) return -1;
 	SDL_DestroySurface(nullCardSurface  );
 
-	struct Card nullCard = {
+	struct Card answerCard = {
 		nullCardTexture,
 		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_W, SCREEN_H),
 		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_W, SCREEN_H),
 		(SDL_FRect){0, 0, CARD_W, CARD_H}
 	};
-	nullCard.rect.x = nullCard.position.x - CARD_W / 2;
-	nullCard.rect.y = nullCard.position.y - CARD_H / 2;
+	answerCard.rect.x = answerCard.position.x - CARD_W / 2;
+	answerCard.rect.y = answerCard.position.y - CARD_H / 2;
 	
 	// #based
 	SDL_Surface* circleCardSurface = SDL_LoadPNG("textures/0.png");
@@ -166,7 +166,7 @@ int main() {
 				if (ticks > PCARDS_DELAY)
 					for (int i=0; i<5; i++)
 						playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y}, SCREEN_W, SCREEN_H);
-				if (ticks > NULLC_DELAY) nullCard.targetPosition = STWCoords((SDL_FPoint){0, NULLC_REG_Y}, SCREEN_W, SCREEN_H);
+				if (ticks > NULLC_DELAY) answerCard.targetPosition = STWCoords((SDL_FPoint){0, NULLC_REG_Y}, SCREEN_W, SCREEN_H);
 				if (ticks > START_DELAY) gameState = STATE_CHOOSING;
 				break;
 			case STATE_CHOOSING:
@@ -196,9 +196,9 @@ int main() {
 			playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
 			playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 		}
-		nullCard.position = lerpV(nullCard.position, nullCard.targetPosition, 0.2);
-		nullCard.rect.x = nullCard.position.x - CARD_W / 2;
-		nullCard.rect.y = nullCard.position.y - CARD_H / 2;
+		answerCard.position = lerpV(answerCard.position, answerCard.targetPosition, 0.2);
+		answerCard.rect.x = answerCard.position.x - CARD_W / 2;
+		answerCard.rect.y = answerCard.position.y - CARD_H / 2;
 
         // Clear the screen
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -209,7 +209,7 @@ int main() {
 
 		// Render the cards
 		for (int i=0; i<5; i++) SDL_RenderTexture(renderer, playerCards[i].texture, NULL, &playerCards[i].rect);
-		SDL_RenderTexture(renderer, nullCard.texture, NULL, &nullCard.rect);
+		SDL_RenderTexture(renderer, answerCard.texture, NULL, &answerCard.rect);
 
         // Render everything
         SDL_RenderPresent(renderer);
@@ -218,12 +218,13 @@ int main() {
     // Everything to the trash bin
 	SDL_DestroyTexture(bgTexture);
 
+	SDL_DestroyTexture(nullCardTexture);
+
 	SDL_DestroyTexture(circleCardTexture);
 	SDL_DestroyTexture(crossCardTexture );
 	SDL_DestroyTexture(waveCardTexture  );
 	SDL_DestroyTexture(squareCardTexture);
 	SDL_DestroyTexture(starCardTexture  );
-	SDL_DestroyTexture(nullCardTexture  );
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
