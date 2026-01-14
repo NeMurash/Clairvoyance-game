@@ -1,8 +1,13 @@
+warnings    := -Wall -Wextra
+additionals := misc-utils.c
+libs        := -lSDL3
+output      := game
+
 game.out: main.c
-	gcc -Wall -Wextra main.c -o game.out -lSDL3
+	gcc $(warnings) main.c $(additionals) -o $(output) $(libs)
 
-run: game.out
-	./game.out
+run: $(output)
+	./$(output)
 
-clean: game.out
-	rm game.out
+clean:
+	rm -f $(output)

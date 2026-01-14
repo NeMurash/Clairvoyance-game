@@ -2,56 +2,27 @@
 #include <stdlib.h>
 #include <SDL3/SDL.h>
 
-// px
+#include "misc-utils.h"
+
+// Pixels
 #define SCREEN_W 1280
 #define SCREEN_H 720
-#define CARD_W 168
-#define CARD_H 240
+#define CARD_W   168
+#define CARD_H   240
 
 // -1 -> 1
-#define PCARD_OFF_X 0.35
-#define PCARD_REG_Y 0.5
-#define PCARD_HOV_Y 0.45
+#define PCARD_OFF_X  0.35
+#define PCARD_REG_Y  0.50
+#define PCARD_HOV_Y  0.45
+#define NULLC_REG_Y -0.50
 
-#define START_DELAY 500 // milliseconds
+// Milliseconds
+#define START_DELAY  1000
+#define PCARDS_DELAY 1000
+#define NULLC_DELAY  500
 
+// Go figure
 #define TARGET_FPS 180
-
-// Screen To World Coordinates Mapping ((-1, 1), (-1, 1)) -> ((0, 1280), (0, 720))
-SDL_FPoint STWCoords(SDL_FPoint point) {
-	return (SDL_FPoint){
-		(point.x - (-1)) / (1 - (-1)) * SCREEN_W,
-		(point.y - (-1)) / (1 - (-1)) * SCREEN_H,
-	};
-}
-// Screen To World Coordinates Mapping ((0, 1280), (0, 720)) -> ((-1, 1), (-1, 1))
-SDL_FPoint WTSCoords(SDL_FPoint point) {
-	return (SDL_FPoint){
-		(point.x) / SCREEN_W * (1 + 1) - 1,
-		(point.y) / SCREEN_H * (1 + 1) - 1,
-	};
-}
-// Linear interpolation of a vector (https://en.wikipedia.org/wiki/Linear_interpolation)
-SDL_FPoint lerpV(SDL_FPoint v0, SDL_FPoint v1, float t) {
-	return (SDL_FPoint) {
-		(1 - t) * v0.x + t * v1.x,
-		(1 - t) * v0.y + t * v1.y
-	};
-}
-// Check if the mouse is over a rectangular region
-bool mouseOverRect(SDL_FPoint mousePos, SDL_FRect rect) {
-	if ((mousePos.x > rect.x && mousePos.x < rect.x + rect.w) &&
-		(mousePos.y > rect.y && mousePos.y < rect.y + rect.h))
-		return true;
-	return false;
-}
-
-struct Card {
-	SDL_Texture* texture;
-	SDL_FPoint position;
-	SDL_FPoint targetPosition;
-	SDL_FRect rect;
-};
 
 int main() {
 	// Boilerplate
@@ -87,31 +58,41 @@ int main() {
 	if (!bgSurface || !bgTexture) return -1;
 	SDL_DestroySurface(bgSurface);
 
+	SDL_Surface* nullCardSurface   = SDL_LoadPNG("textures/5.png");
+	SDL_Texture* nullCardTexture   = SDL_CreateTextureFromSurface(renderer, nullCardSurface  );
+	if (!nullCardSurface   || !nullCardTexture  ) return -1;
+	SDL_DestroySurface(nullCardSurface  );
+
+	struct Card nullCard = {
+		nullCardTexture,
+		STWCoords((SDL_FPoint){0, -2.0}),
+		STWCoords((SDL_FPoint){0, -2.0}),
+		(SDL_FRect){0, 0, CARD_W, CARD_H}
+	};
+	nullCard.rect.x = nullCard.position.x - CARD_W / 2;
+	nullCard.rect.y = nullCard.position.y - CARD_H / 2;
+	
 	// #based
 	SDL_Surface* circleCardSurface = SDL_LoadPNG("textures/0.png");
 	SDL_Surface* crossCardSurface  = SDL_LoadPNG("textures/1.png");
 	SDL_Surface* waveCardSurface   = SDL_LoadPNG("textures/2.png");
 	SDL_Surface* squareCardSurface = SDL_LoadPNG("textures/3.png");
 	SDL_Surface* starCardSurface   = SDL_LoadPNG("textures/4.png");
-	SDL_Surface* nullCardSurface   = SDL_LoadPNG("textures/5.png");
 	SDL_Texture* circleCardTexture = SDL_CreateTextureFromSurface(renderer, circleCardSurface);
 	SDL_Texture* crossCardTexture  = SDL_CreateTextureFromSurface(renderer, crossCardSurface );
 	SDL_Texture* waveCardTexture   = SDL_CreateTextureFromSurface(renderer, waveCardSurface  );
 	SDL_Texture* squareCardTexture = SDL_CreateTextureFromSurface(renderer, squareCardSurface);
 	SDL_Texture* starCardTexture   = SDL_CreateTextureFromSurface(renderer, starCardSurface  );
-	SDL_Texture* nullCardTexture   = SDL_CreateTextureFromSurface(renderer, nullCardSurface  );
 	if (!circleCardSurface || !circleCardTexture) return -1;
 	if (!crossCardSurface  || !crossCardTexture ) return -1;
 	if (!waveCardSurface   || !waveCardTexture  ) return -1;
 	if (!squareCardSurface || !squareCardTexture) return -1;
 	if (!starCardSurface   || !starCardTexture  ) return -1;
-	if (!nullCardSurface   || !nullCardTexture  ) return -1;
 	SDL_DestroySurface(circleCardSurface);
 	SDL_DestroySurface(crossCardSurface );
 	SDL_DestroySurface(waveCardSurface  );
 	SDL_DestroySurface(squareCardSurface);
 	SDL_DestroySurface(starCardSurface  );
-	SDL_DestroySurface(nullCardSurface  );
 
 	struct Card playerCards[5];
 	playerCards[0].texture = circleCardTexture;
@@ -127,7 +108,7 @@ int main() {
 		playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
 		playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 	}
-	
+
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
 	SDL_FPoint mousePosition = {0, 0};
@@ -156,7 +137,7 @@ int main() {
 					// Selecting a card
 					if (event.button.button == 1 && gameState == STATE_CHOOSING) {
 						for (int i=0; i<5; i++) {
-							bool hoveringOver = mouseOverRect(
+							bool hoveringOver = pointInRect(
 								mousePosition,
 							    (SDL_FRect) {
 								    playerCards[i].rect.x,
@@ -182,17 +163,16 @@ int main() {
 		switch (gameState) {
 			case STATE_STARTING:
 				Uint64 ticks = SDL_GetTicks();
-				if (ticks > START_DELAY) {
-					for (int i=0; i<5; i++) {
+				if (ticks > PCARDS_DELAY)
+					for (int i=0; i<5; i++)
 						playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y});
-					}
-					gameState = STATE_CHOOSING;
-				}
+				if (ticks > NULLC_DELAY) nullCard.targetPosition = STWCoords((SDL_FPoint){0, NULLC_REG_Y});
+				if (ticks > START_DELAY) gameState = STATE_CHOOSING;
 				break;
 			case STATE_CHOOSING:
 				// Card hover effect
 				for (int i=0; i<5; i++) {
-					bool hoveringOver = mouseOverRect(
+					bool hoveringOver = pointInRect(
 						mousePosition,
 						(SDL_FRect) {
 							playerCards[i].rect.x,
@@ -210,11 +190,15 @@ int main() {
 			default: break;
 		}
 
+		// Update card positions
 		for (int i=0; i<5; i++) {
 			playerCards[i].position = lerpV(playerCards[i].position, playerCards[i].targetPosition, 0.2);
 			playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
 			playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 		}
+		nullCard.position = lerpV(nullCard.position, nullCard.targetPosition, 0.2);
+		nullCard.rect.x = nullCard.position.x - CARD_W / 2;
+		nullCard.rect.y = nullCard.position.y - CARD_H / 2;
 
         // Clear the screen
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -223,8 +207,9 @@ int main() {
 		// Background
 		SDL_RenderTexture(renderer, bgTexture, NULL, NULL);
 
-		// Render the playing cards
+		// Render the cards
 		for (int i=0; i<5; i++) SDL_RenderTexture(renderer, playerCards[i].texture, NULL, &playerCards[i].rect);
+		SDL_RenderTexture(renderer, nullCard.texture, NULL, &nullCard.rect);
 
         // Render everything
         SDL_RenderPresent(renderer);
