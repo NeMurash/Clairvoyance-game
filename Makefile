@@ -1,10 +1,10 @@
-warnings    := -Wall -Wextra
+cflags      := -Wall -Wextra
 additionals := misc-utils.c
 libs        := -lSDL3
 output      := game
 
 game.out: main.c
-	gcc $(warnings) main.c $(additionals) -o $(output) $(libs)
+	gcc $(cflags) main.c $(additionals) -o $(output) $(libs)
 
 run: $(output)
 	./$(output)
