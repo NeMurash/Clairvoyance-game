@@ -17,12 +17,14 @@
 #define PCARD_OFF_X  0.35
 #define PCARD_REG_Y  0.50
 #define PCARD_HOV_Y  0.40
-#define NULLC_REG_Y -0.50
+#define ANSWC_REG_Y -0.50
+
+// Degrees
+#define MAX_CARD_ROT 45
 
 // Milliseconds
-#define START_DELAY  1000
-#define PCARDS_DELAY 1000
-#define NULLC_DELAY  500
+#define START_DELAY  500
+#define PCARDS_DELAY 500
 
 // Go figure
 #define TARGET_FPS 180
@@ -66,17 +68,8 @@ int main() {
 	SDL_Surface* nullCardSurface   = SDL_LoadPNG("textures/5.png");
 	SDL_Texture* nullCardTexture   = SDL_CreateTextureFromSurface(renderer, nullCardSurface  );
 	if (!nullCardSurface   || !nullCardTexture  ) return -1;
-	SDL_DestroySurface(nullCardSurface  );
+	SDL_DestroySurface(nullCardSurface);
 
-	struct Card answerCard = {
-		nullCardTexture,
-		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_RES),
-		STWCoords((SDL_FPoint){0, -2.0}, SCREEN_RES),
-		(SDL_FRect){0, 0, CARD_W, CARD_H}
-	};
-	answerCard.rect.x = answerCard.position.x - CARD_W / 2;
-	answerCard.rect.y = answerCard.position.y - CARD_H / 2;
-	
 	// #based
 	SDL_Surface* circleCardSurface = SDL_LoadPNG("textures/0.png");
 	SDL_Surface* crossCardSurface  = SDL_LoadPNG("textures/1.png");
@@ -117,6 +110,7 @@ int main() {
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
 	SDL_FPoint mousePosition = {0, 0};
+
     while (!windowShouldClose) {
         // Limit the FPS I think
 		if (SDL_GetTicks() - lastTicks < 1000 / TARGET_FPS) continue;
@@ -153,8 +147,7 @@ int main() {
 							);
 							if (hoveringOver) {
 								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
-								answerCard.texture = cardTextures[rand() % 4 + 1];
-								gameState = STATE_ANSWER;
+								// gameState = STATE_ANSWER;
 							}
 						}
 					}
@@ -172,7 +165,6 @@ int main() {
 				if (ticks > PCARDS_DELAY)
 					for (int i=0; i<5; i++)
 						playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y}, SCREEN_RES);
-				if (ticks > NULLC_DELAY) answerCard.targetPosition = STWCoords((SDL_FPoint){0, NULLC_REG_Y}, SCREEN_RES);
 				if (ticks > START_DELAY) gameState = STATE_CHOOSING;
 				break;
 			case STATE_CHOOSING:
@@ -202,9 +194,6 @@ int main() {
 			playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
 			playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 		}
-		answerCard.position = lerpV(answerCard.position, answerCard.targetPosition, 0.2);
-		answerCard.rect.x = answerCard.position.x - CARD_W / 2;
-		answerCard.rect.y = answerCard.position.y - CARD_H / 2;
 
         // Clear the screen
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
@@ -215,7 +204,6 @@ int main() {
 
 		// Render the cards
 		for (int i=0; i<5; i++) SDL_RenderTexture(renderer, playerCards[i].texture, NULL, &playerCards[i].rect);
-		SDL_RenderTexture(renderer, answerCard.texture, NULL, &answerCard.rect);
 
         // Render everything
         SDL_RenderPresent(renderer);
