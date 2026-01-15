@@ -22,4 +22,12 @@ struct Card {
 	SDL_FRect    rect;
 };
 
+enum CardType {
+	CARD_CIRCLE,
+	CARD_CROSS,
+	CARD_WAVE,
+	CARD_SQUARE,
+	CARD_STAR
+};
+
 #endif

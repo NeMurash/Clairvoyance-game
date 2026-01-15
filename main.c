@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 #include <SDL3/SDL.h>
 
 #include "misc-utils.h"
 
 // Pixels
-#define SCREEN_W 1280
-#define SCREEN_H 720
+#define SCREEN_W   1280
+#define SCREEN_H   720
 #define SCREEN_RES (SDL_FPoint){SCREEN_W, SCREEN_H}
-#define CARD_W   168
-#define CARD_H   240
+#define CARD_W     168
+#define CARD_H     240
 
 // -1 -> 1
 #define PCARD_OFF_X  0.35
@@ -47,6 +49,8 @@ int main() {
 
     if (window == NULL || renderer == NULL) return 1;
 
+	srand(time(NULL));
+
 	// Start of the actual thing 👀
 	enum {
 		STATE_STARTING,
@@ -79,16 +83,20 @@ int main() {
 	SDL_Surface* waveCardSurface   = SDL_LoadPNG("textures/2.png");
 	SDL_Surface* squareCardSurface = SDL_LoadPNG("textures/3.png");
 	SDL_Surface* starCardSurface   = SDL_LoadPNG("textures/4.png");
-	SDL_Texture* circleCardTexture = SDL_CreateTextureFromSurface(renderer, circleCardSurface);
-	SDL_Texture* crossCardTexture  = SDL_CreateTextureFromSurface(renderer, crossCardSurface );
-	SDL_Texture* waveCardTexture   = SDL_CreateTextureFromSurface(renderer, waveCardSurface  );
-	SDL_Texture* squareCardTexture = SDL_CreateTextureFromSurface(renderer, squareCardSurface);
-	SDL_Texture* starCardTexture   = SDL_CreateTextureFromSurface(renderer, starCardSurface  );
-	if (!circleCardSurface || !circleCardTexture) return -1;
-	if (!crossCardSurface  || !crossCardTexture ) return -1;
-	if (!waveCardSurface   || !waveCardTexture  ) return -1;
-	if (!squareCardSurface || !squareCardTexture) return -1;
-	if (!starCardSurface   || !starCardTexture  ) return -1;
+	if (!circleCardSurface) return -1;
+	if (!crossCardSurface ) return -1;
+	if (!waveCardSurface  ) return -1;
+	if (!squareCardSurface) return -1;
+	if (!starCardSurface  ) return -1;
+
+	SDL_Texture* cardTextures[5];
+	cardTextures[CARD_CIRCLE] = SDL_CreateTextureFromSurface(renderer, circleCardSurface);
+	cardTextures[CARD_CROSS ] = SDL_CreateTextureFromSurface(renderer, crossCardSurface );
+	cardTextures[CARD_WAVE  ] = SDL_CreateTextureFromSurface(renderer, waveCardSurface  );
+	cardTextures[CARD_SQUARE] = SDL_CreateTextureFromSurface(renderer, squareCardSurface);
+	cardTextures[CARD_STAR  ] = SDL_CreateTextureFromSurface(renderer, starCardSurface  );
+	for (int i=0; i<5; i++) if (!cardTextures[i]) return -1;
+
 	SDL_DestroySurface(circleCardSurface);
 	SDL_DestroySurface(crossCardSurface );
 	SDL_DestroySurface(waveCardSurface  );
@@ -96,12 +104,8 @@ int main() {
 	SDL_DestroySurface(starCardSurface  );
 
 	struct Card playerCards[5];
-	playerCards[0].texture = circleCardTexture;
-	playerCards[1].texture = crossCardTexture;
-	playerCards[2].texture = waveCardTexture;
-	playerCards[3].texture = squareCardTexture;
-	playerCards[4].texture = starCardTexture;
 	for (int i=0; i<5; i++) {
+		playerCards[i].texture = cardTextures[i];
 		playerCards[i].position = STWCoords((SDL_FPoint){0, 2}, SCREEN_RES);
 		playerCards[i].targetPosition = playerCards[i].position;
 		playerCards[i].rect.w = CARD_W;
@@ -148,8 +152,9 @@ int main() {
 								}
 							);
 							if (hoveringOver) {
-								gameState = STATE_ANSWER;
 								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
+								answerCard.texture = cardTextures[rand() % 4 + 1];
+								gameState = STATE_ANSWER;
 							}
 						}
 					}
@@ -221,11 +226,7 @@ int main() {
 
 	SDL_DestroyTexture(nullCardTexture);
 
-	SDL_DestroyTexture(circleCardTexture);
-	SDL_DestroyTexture(crossCardTexture );
-	SDL_DestroyTexture(waveCardTexture  );
-	SDL_DestroyTexture(squareCardTexture);
-	SDL_DestroyTexture(starCardTexture  );
+	for (int i=0; i<5; i++) SDL_DestroyTexture(cardTextures[i]);
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
