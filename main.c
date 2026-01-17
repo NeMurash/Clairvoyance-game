@@ -10,8 +10,8 @@
 #define SCREEN_W   1280
 #define SCREEN_H   720
 #define SCREEN_RES (SDL_FPoint){SCREEN_W, SCREEN_H}
-#define CARD_W     168
-#define CARD_H     240
+#define CARD_W     178
+#define CARD_H     250
 
 // -1 -> 1
 #define PCARD_OFF_X  0.35
