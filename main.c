@@ -56,7 +56,8 @@ int main() {
 	enum {
 		STATE_STARTING,
 		STATE_CHOOSING,
-		STATE_ANSWER
+		STATE_ANSWERED,
+		STATE_ANSWER,
 	} gameState = STATE_STARTING;
 
 	SDL_Surface* bgSurface = SDL_LoadPNG("textures/bg.png");
@@ -106,6 +107,21 @@ int main() {
 		playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 	}
 
+	struct CardListNode *cardFirst = (struct CardListNode*) malloc(sizeof(struct CardListNode));
+	cardFirst->card = (struct Card) {
+		nullCardTexture,
+		STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
+		STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
+		(SDL_FRect) {0, 0, CARD_W, CARD_H}
+	};
+	cardFirst->prev = NULL;
+	cardFirst->next = NULL;
+	struct CardListNode *cardLast = cardFirst;
+
+	int AnsCardCount = 1;
+
+	struct CardListNode *curr;
+
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
 	SDL_FPoint mousePosition = {0, 0};
@@ -144,9 +160,10 @@ int main() {
 								    CARD_H
 								}
 							);
+							// Clicked a card
 							if (hoveringOver) {
 								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
-								// gameState = STATE_ANSWER;
+								gameState = STATE_ANSWERED;
 							}
 						}
 					}
@@ -182,7 +199,29 @@ int main() {
 					else playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
 				}
 				break;
+			case STATE_ANSWERED:
+				cardLast->card.texture = cardTextures[rand() % 5];
+				cardLast->card.targetPosition.y = STWCoords((SDL_FPoint){0, ANSWC_REG_Y}, SCREEN_RES).y;
+
+				curr = cardLast;
+				cardLast->next = (struct CardListNode*) malloc(sizeof(struct CardListNode));
+				cardLast->next->card = (struct Card) {
+					nullCardTexture,
+					STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
+					STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
+					(SDL_FRect) {0, 0, CARD_W, CARD_H}
+				};
+				cardLast->next->prev = cardLast;
+				cardLast->next->next = NULL;
+
+				cardLast = cardLast->next;
+
+				AnsCardCount++;
+
+				gameState = STATE_ANSWER;
+				break;
 			case STATE_ANSWER:
+				gameState = STATE_CHOOSING;
 				break;
 			default: break;
 		}
@@ -192,6 +231,13 @@ int main() {
 			playerCards[i].position = lerpV(playerCards[i].position, playerCards[i].targetPosition, 0.2);
 			playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
 			playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
+		}
+		curr = cardFirst;
+		while (curr) {
+			curr->card.position = lerpV(curr->card.position, curr->card.targetPosition, 0.2);
+			curr->card.rect.x = curr->card.position.x - CARD_W / 2;
+			curr->card.rect.y = curr->card.position.y - CARD_H / 2;
+			curr = curr->next;
 		}
 
         // Clear the screen
@@ -204,6 +250,13 @@ int main() {
 		// Render the cards
 		for (int i=0; i<5; i++) SDL_RenderTexture(renderer, playerCards[i].texture, NULL, &playerCards[i].rect);
 
+		// Render answer cards
+		curr = cardFirst;
+		while (curr) {
+			SDL_RenderTexture(renderer, curr->card.texture, NULL, &curr->card.rect);
+			curr = curr->next;
+		}
+
         // Render everything
         SDL_RenderPresent(renderer);
     }
@@ -214,6 +267,19 @@ int main() {
 	SDL_DestroyTexture(nullCardTexture);
 
 	for (int i=0; i<5; i++) SDL_DestroyTexture(cardTextures[i]);
+
+	curr = cardFirst;
+	struct CardListNode *next = cardFirst->next;
+	while (curr) {
+		free(curr);
+		if (next) {
+			curr = next;
+			next = curr->next;
+		}
+		else {
+			curr = NULL;
+		}
+	}
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);

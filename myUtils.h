@@ -13,6 +13,7 @@ SDL_FPoint lerpV(SDL_FPoint v0, SDL_FPoint v1, float t);
 // Check if a point is inside of a rectangular region
 bool pointInRect(SDL_FPoint pt, SDL_FRect rect);
 
+// Structs
 struct Card {
 	SDL_Texture* texture;
 	SDL_FPoint   position;
@@ -20,6 +21,13 @@ struct Card {
 	SDL_FRect    rect;
 };
 
+struct CardListNode {
+	struct Card card;
+	struct CardListNode *prev;
+	struct CardListNode *next;
+};
+
+// Enums
 enum CardType {
 	CARD_CIRCLE,
 	CARD_CROSS,
