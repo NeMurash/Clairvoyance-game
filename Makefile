@@ -1,5 +1,5 @@
 cflags      := -Wall -Wextra
-additionals := misc-utils.c
+additionals := 
 libs        := -lSDL3
 output      := game.out
 

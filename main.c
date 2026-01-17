@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include <SDL3/SDL.h>
 
-#include "misc-utils.h"
+#include "myUtils.h"
 
 // Pixels
 #define SCREEN_W   1280
