@@ -200,6 +200,8 @@ int main() {
 				}
 				break;
 			case STATE_ANSWERED:
+				// TODO: Start deleting the first cards from the list once their number surpasses the limit
+				// TODO: Add random rotation to each answer card upon getting revealed
 				cardLast->card.texture = cardTextures[rand() % 5];
 				cardLast->card.targetPosition.y = STWCoords((SDL_FPoint){0, ANSWC_REG_Y}, SCREEN_RES).y;
 
