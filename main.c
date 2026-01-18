@@ -22,6 +22,9 @@
 // Degrees
 #define MAX_CARD_ROT 15
 
+// Amount of cards
+#define MAX_ANS_CARDS 15
+
 // Milliseconds
 #define START_DELAY  500
 #define PCARDS_DELAY 500
@@ -147,9 +150,6 @@ int main() {
 						case SDL_SCANCODE_ESCAPE:
 							windowShouldClose = true;
 							break;
-						case SDL_SCANCODE_RETURN:
-							gameState = STATE_ANSWERED;
-							break;
 						default: break;
 					}
 					break;
@@ -226,7 +226,7 @@ int main() {
 
 				ansCardCount++;
 
-				if (ansCardCount > 10) {
+				if (ansCardCount > MAX_ANS_CARDS) {
 					curr = cardFirst->next;
 					curr->prev = NULL;
 					free(cardFirst);
