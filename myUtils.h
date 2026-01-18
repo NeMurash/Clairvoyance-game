@@ -23,6 +23,7 @@ struct Card {
 
 struct CardListNode {
 	struct Card card;
+	float rotation;
 	struct CardListNode *prev;
 	struct CardListNode *next;
 };

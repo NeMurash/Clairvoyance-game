@@ -13,13 +13,14 @@
 #define CARD_H     250
 
 // -1 -> 1
-#define PCARD_OFF_X  0.35
-#define PCARD_REG_Y  0.50
-#define PCARD_HOV_Y  0.40
-#define ANSWC_REG_Y -0.50
+#define PCARD_OFF_X       0.35
+#define PCARD_REG_Y       0.50
+#define PCARD_HOV_Y       0.40
+#define ANSWC_REG_Y      -0.50
+#define ANSWC_RAND_OFF_X  0.15
 
 // Degrees
-#define MAX_CARD_ROT 45
+#define MAX_CARD_ROT 15
 
 // Milliseconds
 #define START_DELAY  500
@@ -114,6 +115,8 @@ int main() {
 		STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
 		(SDL_FRect) {0, 0, CARD_W, CARD_H}
 	};
+	cardFirst->card.targetPosition.x = STWCoords((SDL_FPoint){(float)(rand() % 100 + 1 - 50) / 100.0 * ANSWC_RAND_OFF_X, 0.0}, SCREEN_RES).x;
+	cardFirst->rotation = (rand() % ((MAX_CARD_ROT * 2) + 1)) - MAX_CARD_ROT;
 	cardFirst->prev = NULL;
 	cardFirst->next = NULL;
 	struct CardListNode *cardLast = cardFirst;
@@ -213,6 +216,8 @@ int main() {
 					STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
 					(SDL_FRect) {0, 0, CARD_W, CARD_H}
 				};
+				cardLast->next->card.targetPosition.x = STWCoords((SDL_FPoint){(float)(rand() % 100 + 1 - 50) / 100.0 * ANSWC_RAND_OFF_X, 0.0}, SCREEN_RES).x;
+				cardLast->next->rotation = (rand() % ((MAX_CARD_ROT * 2) + 1)) - MAX_CARD_ROT;
 				cardLast->next->prev = cardLast;
 				cardLast->next->next = NULL;
 
@@ -255,7 +260,7 @@ int main() {
 		// Render answer cards
 		curr = cardFirst;
 		while (curr) {
-			SDL_RenderTexture(renderer, curr->card.texture, NULL, &curr->card.rect);
+			SDL_RenderTextureRotated(renderer, curr->card.texture, NULL, &curr->card.rect, curr->rotation, NULL, SDL_FLIP_NONE);
 			curr = curr->next;
 		}
 
