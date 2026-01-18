@@ -121,7 +121,7 @@ int main() {
 	cardFirst->next = NULL;
 	struct CardListNode *cardLast = cardFirst;
 
-	int AnsCardCount = 1;
+	int ansCardCount = 1;
 
 	struct CardListNode *curr;
 
@@ -146,6 +146,9 @@ int main() {
 					switch (event.key.scancode) {
 						case SDL_SCANCODE_ESCAPE:
 							windowShouldClose = true;
+							break;
+						case SDL_SCANCODE_RETURN:
+							gameState = STATE_ANSWERED;
 							break;
 						default: break;
 					}
@@ -203,8 +206,6 @@ int main() {
 				}
 				break;
 			case STATE_ANSWERED:
-				// TODO: Start deleting the first cards from the list once their number surpasses the limit
-				// TODO: Add random rotation to each answer card upon getting revealed
 				cardLast->card.texture = cardTextures[rand() % 5];
 				cardLast->card.targetPosition.y = STWCoords((SDL_FPoint){0, ANSWC_REG_Y}, SCREEN_RES).y;
 
@@ -223,7 +224,15 @@ int main() {
 
 				cardLast = cardLast->next;
 
-				AnsCardCount++;
+				ansCardCount++;
+
+				if (ansCardCount > 10) {
+					curr = cardFirst->next;
+					curr->prev = NULL;
+					free(cardFirst);
+					cardFirst = curr;
+					ansCardCount--;
+				}
 
 				gameState = STATE_ANSWER;
 				break;
