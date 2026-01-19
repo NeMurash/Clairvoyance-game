@@ -145,9 +145,20 @@ int main() {
 	cardFirst->next = NULL;
 	struct CardListNode *cardLast = cardFirst;
 
+	struct IntListNode *numFirst = (struct IntListNode*) malloc(sizeof(struct IntListNode));
+	numFirst->val  = 0;
+	numFirst->prev = NULL;
+	numFirst->next = NULL;
+	struct IntListNode *numLast = numFirst;
+
+	numLast = addIntListNode(numLast, 0);
+	numLast = addIntListNode(numLast, 0);
+	numLast = addIntListNode(numLast, 0);
+
 	int ansCardCount = 1;
 
-	struct CardListNode *curr;
+	struct CardListNode *currCard;
+	struct IntListNode  *currNum;
 
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
@@ -231,7 +242,6 @@ int main() {
 				cardLast->card.texture = cardTextures[rand() % 5];
 				cardLast->card.targetPosition.y = STWCoords((SDL_FPoint){0, ANSWC_REG_Y}, SCREEN_RES).y;
 
-				curr = cardLast;
 				cardLast->next = (struct CardListNode*) malloc(sizeof(struct CardListNode));
 				cardLast->next->card = (struct Card) {
 					nullCardTexture,
@@ -249,10 +259,10 @@ int main() {
 				ansCardCount++;
 
 				if (ansCardCount > MAX_ANS_CARDS) {
-					curr = cardFirst->next;
-					curr->prev = NULL;
+					currCard = cardFirst->next;
+					currCard->prev = NULL;
 					free(cardFirst);
-					cardFirst = curr;
+					cardFirst = currCard;
 					ansCardCount--;
 				}
 
@@ -270,12 +280,12 @@ int main() {
 			playerCards[i].rect.x = playerCards[i].position.x - CARD_W / 2;
 			playerCards[i].rect.y = playerCards[i].position.y - CARD_H / 2;
 		}
-		curr = cardFirst;
-		while (curr) {
-			curr->card.position = lerpV(curr->card.position, curr->card.targetPosition, 0.2);
-			curr->card.rect.x = curr->card.position.x - CARD_W / 2;
-			curr->card.rect.y = curr->card.position.y - CARD_H / 2;
-			curr = curr->next;
+		currCard = cardFirst;
+		while (currCard) {
+			currCard->card.position = lerpV(currCard->card.position, currCard->card.targetPosition, 0.2);
+			currCard->card.rect.x = currCard->card.position.x - CARD_W / 2;
+			currCard->card.rect.y = currCard->card.position.y - CARD_H / 2;
+			currCard = currCard->next;
 		}
 
         // Clear the screen
@@ -289,14 +299,18 @@ int main() {
 		for (int i=0; i<5; i++) SDL_RenderTexture(renderer, playerCards[i].texture, NULL, &playerCards[i].rect);
 
 		// Render answer cards
-		curr = cardFirst;
-		while (curr) {
-			SDL_RenderTextureRotated(renderer, curr->card.texture, NULL, &curr->card.rect, curr->rotation, NULL, SDL_FLIP_NONE);
-			curr = curr->next;
+		currCard = cardFirst;
+		while (currCard) {
+			SDL_RenderTextureRotated(renderer, currCard->card.texture, NULL, &currCard->card.rect, currCard->rotation, NULL, SDL_FLIP_NONE);
+			currCard = currCard->next;
 		}
 
-		for (int i=1; i<=10; i++) {
+		// Render score numbers
+		currNum = numFirst;
+		for (int i=0; currNum; i++) {
 			numberRendRect.x = i * (NUMBER_W + 10);
+			SDL_RenderTexture(renderer, numberTextures[currNum->val % 10], NULL, &numberRendRect);
+			currNum = currNum->next;
 		}
 
         // Render everything
@@ -312,17 +326,26 @@ int main() {
 
 	for (int i=0; i<10; i++) SDL_DestroyTexture(numberTextures[i]);
 
-	curr = cardFirst;
-	struct CardListNode *next = cardFirst->next;
-	while (curr) {
-		free(curr);
-		if (next) {
-			curr = next;
-			next = curr->next;
+	currCard = cardFirst;
+	struct CardListNode *nextCard = cardFirst->next;
+	while (currCard) {
+		free(currCard);
+		if (nextCard) {
+			currCard = nextCard;
+			nextCard = currCard->next;
 		}
-		else {
-			curr = NULL;
+		else currCard = NULL;
+	}
+
+	currNum = numFirst;
+	struct IntListNode *nextNum = currNum->next;
+	while (currNum) {
+		free(currNum);
+		if (nextNum) {
+			currNum = nextNum;
+			nextNum = currNum->next;
 		}
+		else currNum = NULL;
 	}
 
     SDL_DestroyWindow(window);

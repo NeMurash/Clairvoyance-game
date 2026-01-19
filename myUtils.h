@@ -23,9 +23,18 @@ struct Card {
 
 struct IntListNode {
 	int val;
-	struct ListNode *prev;
-	struct ListNode *next;
+	struct IntListNode *prev;
+	struct IntListNode *next;
 };
+
+struct IntListNode *addIntListNode(struct IntListNode *lastNode, int val) {
+	lastNode->next = (struct IntListNode*) malloc(sizeof(struct IntListNode));
+	lastNode->next->val  = val;
+	lastNode->next->prev = lastNode;
+	lastNode->next->next = NULL;
+
+	return lastNode->next;
+}
 
 struct CardListNode {
 	struct Card card;
