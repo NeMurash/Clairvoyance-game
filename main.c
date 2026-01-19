@@ -168,7 +168,7 @@ int main() {
 							);
 							// Clicked a card
 							if (hoveringOver) {
-								playerCards[i].targetPosition.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
+								playerCards[i].position.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
 								gameState = STATE_ANSWERED;
 							}
 						}
