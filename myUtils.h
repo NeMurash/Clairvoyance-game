@@ -21,6 +21,12 @@ struct Card {
 	SDL_FRect    rect;
 };
 
+struct IntListNode {
+	int val;
+	struct ListNode *prev;
+	struct ListNode *next;
+};
+
 struct CardListNode {
 	struct Card card;
 	float rotation;

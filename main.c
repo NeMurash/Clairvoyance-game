@@ -11,6 +11,8 @@
 #define SCREEN_RES (SDL_FPoint){SCREEN_W, SCREEN_H}
 #define CARD_W     178
 #define CARD_H     250
+#define NUMBER_W   32
+#define NUMBER_H   48
 
 // -1 -> 1
 #define PCARD_OFF_X       0.35
@@ -69,8 +71,27 @@ int main() {
 	if (!bgSurface || !bgTexture) return -1;
 	SDL_DestroySurface(bgSurface);
 
+	SDL_Surface *numberSurfaces[10];
+	SDL_Texture *numberTextures[10];
+	numberSurfaces[0] = SDL_LoadPNG("textures/numbers/0.PNG");
+	numberSurfaces[1] = SDL_LoadPNG("textures/numbers/1.PNG");
+	numberSurfaces[2] = SDL_LoadPNG("textures/numbers/2.PNG");
+	numberSurfaces[3] = SDL_LoadPNG("textures/numbers/3.PNG");
+	numberSurfaces[4] = SDL_LoadPNG("textures/numbers/4.PNG");
+	numberSurfaces[5] = SDL_LoadPNG("textures/numbers/5.PNG");
+	numberSurfaces[6] = SDL_LoadPNG("textures/numbers/6.PNG");
+	numberSurfaces[7] = SDL_LoadPNG("textures/numbers/7.PNG");
+	numberSurfaces[8] = SDL_LoadPNG("textures/numbers/8.PNG");
+	numberSurfaces[9] = SDL_LoadPNG("textures/numbers/9.PNG");
+	for (int i=0; i<10; i++) {
+		if (!numberSurfaces[i]) return -1;
+		numberTextures[i] = SDL_CreateTextureFromSurface(renderer, numberSurfaces[i]);
+		SDL_DestroySurface(numberSurfaces[i]);
+		if (!numberTextures[i]) return -1;
+	}
+
 	SDL_Surface* nullCardSurface   = SDL_LoadPNG("textures/5.png");
-	SDL_Texture* nullCardTexture   = SDL_CreateTextureFromSurface(renderer, nullCardSurface  );
+	SDL_Texture* nullCardTexture   = SDL_CreateTextureFromSurface(renderer, nullCardSurface);
 	if (!nullCardSurface   || !nullCardTexture  ) return -1;
 	SDL_DestroySurface(nullCardSurface);
 
@@ -131,6 +152,7 @@ int main() {
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
 	SDL_FPoint mousePosition = {0, 0};
+	SDL_FRect numberRendRect = {0, 0, NUMBER_W, NUMBER_H};
 
     while (!windowShouldClose) {
         // Limit the FPS I think
@@ -273,6 +295,10 @@ int main() {
 			curr = curr->next;
 		}
 
+		for (int i=1; i<=10; i++) {
+			numberRendRect.x = i * (NUMBER_W + 10);
+		}
+
         // Render everything
         SDL_RenderPresent(renderer);
     }
@@ -283,6 +309,8 @@ int main() {
 	SDL_DestroyTexture(nullCardTexture);
 
 	for (int i=0; i<5; i++) SDL_DestroyTexture(cardTextures[i]);
+
+	for (int i=0; i<10; i++) SDL_DestroyTexture(numberTextures[i]);
 
 	curr = cardFirst;
 	struct CardListNode *next = cardFirst->next;
