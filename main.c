@@ -181,6 +181,7 @@ int main() {
 						default: break;
 					}
 
+					// Keyboard support or something
 					if (gameState == STATE_CHOOSING) {
 						switch (event.key.scancode) {
 							case SDL_SCANCODE_1:
@@ -188,7 +189,7 @@ int main() {
 							case SDL_SCANCODE_3:
 							case SDL_SCANCODE_4:
 							case SDL_SCANCODE_5:
-								int numPressed = event.key.scancode - 0x1d;
+								int numPressed = event.key.scancode - 0x1d; // Consult the SDL wiki to find the meaning of this cryptic hex rune
 								playerCards[numPressed - 1].position.y = STWCoords((SDL_FPoint){0, PCARD_FUN_Y}, SCREEN_RES).y;
 								chosenCardTexture = cardTextures[numPressed - 1];
 								gameState = STATE_ANSWERED;
