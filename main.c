@@ -155,6 +155,13 @@ int main() {
 
 	SDL_FPoint mousePosition = {0, 0};
 
+	SDL_FRect numRendRect = {
+		0,
+		0,
+		NUMBER_W,
+		NUMBER_H
+	};
+
 	SDL_Texture *chosenCardTexture = NULL;
 
 	int score     = 0;
@@ -287,8 +294,6 @@ int main() {
 				}
 				else score = 0;
 
-				printf("Score: %d, HScore: %d\n", score, hiScore);
-
 				gameState = STATE_ANSWER;
 				break;
 			case STATE_ANSWER:
@@ -327,6 +332,26 @@ int main() {
 			SDL_RenderTextureRotated(renderer, currCard->card.texture, NULL, &currCard->card.rect, currCard->rotation, NULL, SDL_FLIP_NONE);
 			currCard = currCard->next;
 		}
+
+		tempScore = score;
+		int counter0 = 10;
+		do {
+			numRendRect.x = counter0 * (NUMBER_W + 10);
+			numRendRect.y = 0;
+			SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
+			counter0--;
+			tempScore /= 10;
+		} while (tempScore != 0);
+
+		tempScore = hiScore;
+		counter0 = 10;
+		do {
+			numRendRect.x = counter0 * (NUMBER_W + 10);
+			numRendRect.y = NUMBER_H + 10;
+			SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
+			counter0--;
+			tempScore /= 10;
+		} while (tempScore != 0);
 
         // Render everything
         SDL_RenderPresent(renderer);
