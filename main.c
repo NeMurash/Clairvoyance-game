@@ -157,8 +157,9 @@ int main() {
 
 	SDL_Texture *chosenCardTexture = NULL;
 
-	int score   = 0;
-	int hiScore = 0;
+	int score     = 0;
+	int hiScore   = 0;
+	int tempScore = 0;
 
     while (!windowShouldClose) {
         // Limit the FPS I think
@@ -189,7 +190,7 @@ int main() {
 							case SDL_SCANCODE_3:
 							case SDL_SCANCODE_4:
 							case SDL_SCANCODE_5:
-								int numPressed = event.key.scancode - 0x1d; // Consult the SDL wiki to find the meaning of this cryptic hex rune
+								int numPressed = event.key.scancode - 0x1d; /* https://wiki.libsdl.org/SDL3/SDL_Scancode */
 								playerCards[numPressed - 1].position.y = STWCoords((SDL_FPoint){0, PCARD_FUN_Y}, SCREEN_RES).y;
 								chosenCardTexture = cardTextures[numPressed - 1];
 								gameState = STATE_ANSWERED;
