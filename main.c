@@ -191,13 +191,24 @@ int main() {
 
 					// Keyboard support or something
 					if (gameState == STATE_CHOOSING) {
+						int numPressed = 0;
 						switch (event.key.scancode) {
 							case SDL_SCANCODE_1:
 							case SDL_SCANCODE_2:
 							case SDL_SCANCODE_3:
 							case SDL_SCANCODE_4:
 							case SDL_SCANCODE_5:
-								int numPressed = event.key.scancode - 0x1d; /* https://wiki.libsdl.org/SDL3/SDL_Scancode */
+								numPressed = event.key.scancode - 0x1d; /* https://wiki.libsdl.org/SDL3/SDL_Scancode */
+								playerCards[numPressed - 1].position.y = STWCoords((SDL_FPoint){0, PCARD_FUN_Y}, SCREEN_RES).y;
+								chosenCardTexture = cardTextures[numPressed - 1];
+								gameState = STATE_ANSWERED;
+								break;
+							case SDL_SCANCODE_KP_1:
+							case SDL_SCANCODE_KP_2:
+							case SDL_SCANCODE_KP_3:
+							case SDL_SCANCODE_KP_4:
+							case SDL_SCANCODE_KP_5:
+								numPressed = event.key.scancode - 0x58; /* https://wiki.libsdl.org/SDL3/SDL_Scancode */
 								playerCards[numPressed - 1].position.y = STWCoords((SDL_FPoint){0, PCARD_FUN_Y}, SCREEN_RES).y;
 								chosenCardTexture = cardTextures[numPressed - 1];
 								gameState = STATE_ANSWERED;
