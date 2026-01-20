@@ -18,6 +18,7 @@
 #define PCARD_OFF_X       0.35
 #define PCARD_REG_Y       0.50
 #define PCARD_HOV_Y       0.40
+#define PCARD_FUN_Y       0.35
 #define ANSWC_REG_Y      -0.50
 #define ANSWC_RAND_OFF_X  0.15
 
@@ -145,25 +146,19 @@ int main() {
 	cardFirst->next = NULL;
 	struct CardListNode *cardLast = cardFirst;
 
-	struct IntListNode *numFirst = (struct IntListNode*) malloc(sizeof(struct IntListNode));
-	numFirst->val  = 0;
-	numFirst->prev = NULL;
-	numFirst->next = NULL;
-	struct IntListNode *numLast = numFirst;
-
-	numLast = addIntListNode(numLast, 0);
-	numLast = addIntListNode(numLast, 0);
-	numLast = addIntListNode(numLast, 0);
-
 	int ansCardCount = 1;
 
 	struct CardListNode *currCard;
-	struct IntListNode  *currNum;
 
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
+
 	SDL_FPoint mousePosition = {0, 0};
-	SDL_FRect numberRendRect = {0, 0, NUMBER_W, NUMBER_H};
+
+	SDL_Texture *chosenCardTexture = NULL;
+
+	int score   = 0;
+	int hiScore = 0;
 
     while (!windowShouldClose) {
         // Limit the FPS I think
@@ -185,6 +180,23 @@ int main() {
 							break;
 						default: break;
 					}
+
+					if (gameState == STATE_CHOOSING) {
+						switch (event.key.scancode) {
+							case SDL_SCANCODE_1:
+							case SDL_SCANCODE_2:
+							case SDL_SCANCODE_3:
+							case SDL_SCANCODE_4:
+							case SDL_SCANCODE_5:
+								int numPressed = event.key.scancode - 0x1d;
+								playerCards[numPressed - 1].position.y = STWCoords((SDL_FPoint){0, PCARD_FUN_Y}, SCREEN_RES).y;
+								chosenCardTexture = cardTextures[numPressed - 1];
+								gameState = STATE_ANSWERED;
+								break;
+							default: break;
+						}
+					}
+
 					break;
 				case SDL_EVENT_MOUSE_BUTTON_DOWN:
 					// Selecting a card
@@ -201,7 +213,8 @@ int main() {
 							);
 							// Clicked a card
 							if (hoveringOver) {
-								playerCards[i].position.y = STWCoords((SDL_FPoint){0.0, PCARD_REG_Y}, SCREEN_RES).y;
+								playerCards[i].position.y = STWCoords((SDL_FPoint){0.0, PCARD_FUN_Y}, SCREEN_RES).y;
+								chosenCardTexture = playerCards[i].texture;
 								gameState = STATE_ANSWERED;
 							}
 						}
@@ -266,6 +279,14 @@ int main() {
 					ansCardCount--;
 				}
 
+				if (chosenCardTexture == cardLast->prev->card.texture) {
+					score++;
+					if (score > hiScore) hiScore = score;
+				}
+				else score = 0;
+
+				printf("Score: %d, HScore: %d\n", score, hiScore);
+
 				gameState = STATE_ANSWER;
 				break;
 			case STATE_ANSWER:
@@ -305,14 +326,6 @@ int main() {
 			currCard = currCard->next;
 		}
 
-		// Render score numbers
-		currNum = numFirst;
-		for (int i=0; currNum; i++) {
-			numberRendRect.x = i * (NUMBER_W + 10);
-			SDL_RenderTexture(renderer, numberTextures[currNum->val % 10], NULL, &numberRendRect);
-			currNum = currNum->next;
-		}
-
         // Render everything
         SDL_RenderPresent(renderer);
     }
@@ -335,17 +348,6 @@ int main() {
 			nextCard = currCard->next;
 		}
 		else currCard = NULL;
-	}
-
-	currNum = numFirst;
-	struct IntListNode *nextNum = currNum->next;
-	while (currNum) {
-		free(currNum);
-		if (nextNum) {
-			currNum = nextNum;
-			nextNum = currNum->next;
-		}
-		else currNum = NULL;
 	}
 
     SDL_DestroyWindow(window);
