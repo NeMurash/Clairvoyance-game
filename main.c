@@ -75,7 +75,7 @@ int main() {
 	fread(bgColourBuffer, sizeof(char), 7, bgConfFile);
 	fclose(bgConfFile);
 
-	int bgColours[3];
+	int bgColours[3] = {255, 255, 255};
 
 	for (int i=0; i<3; i++) {
 		bgColours[i]  = h2i(bgColourBuffer[bgColourBufferCount]) * 16;

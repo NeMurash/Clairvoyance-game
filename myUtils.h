@@ -74,22 +74,22 @@ int h2i(char c) {
 	}
 
 	switch (c) {
-		case 'a':
+		case 'a': case 'A':
 			res = 10;
 			break;
-		case 'b':
+		case 'b': case 'B':
 			res = 11;
 			break;
-		case 'c':
+		case 'c': case 'C':
 			res = 12;
 			break;
-		case 'd':
+		case 'd': case 'D':
 			res = 13;
 			break;
-		case 'e':
+		case 'e': case 'E':
 			res = 14;
 			break;
-		case 'f':
+		case 'f': case 'F':
 			res = 15;
 			break;
 		default: res = -1; break;
