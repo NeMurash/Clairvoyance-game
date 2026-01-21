@@ -32,3 +32,7 @@ But be warned... The game only reads the first 6 characters from that file becau
 ## Hi
 
 That's all I think.
+
+Oh yeah you can also use the number keys on your keyboard to pick the cards.
+
+![example gif](/misc/example.gif)
