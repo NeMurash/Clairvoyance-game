@@ -13,6 +13,12 @@
 #define CARD_H     250
 #define NUMBER_W   32
 #define NUMBER_H   48
+#define NUM_OFF_X  240
+#define NUM_OFF_Y  64
+#define SCORE_W    399
+#define SCORE_H    188
+#define SCORE_X    32
+#define SCORE_Y    32
 
 // -1 -> 1
 #define PCARD_OFF_X       0.35
@@ -71,6 +77,11 @@ int main() {
 	SDL_Texture* bgTexture = SDL_CreateTextureFromSurface(renderer, bgSurface);
 	if (!bgSurface || !bgTexture) return -1;
 	SDL_DestroySurface(bgSurface);
+
+	SDL_Surface *scoreSurface = SDL_LoadPNG("textures/score.png");
+	SDL_Texture *scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
+	if (!scoreSurface || !scoreTexture) return -1;
+	SDL_DestroySurface(scoreSurface);
 
 	SDL_Surface *numberSurfaces[10];
 	SDL_Texture *numberTextures[10];
@@ -160,6 +171,12 @@ int main() {
 		0,
 		NUMBER_W,
 		NUMBER_H
+	};
+	SDL_FRect scoreRendRect = {
+		SCORE_X,
+		SCORE_Y,
+		SCORE_W,
+		SCORE_H
 	};
 
 	SDL_Texture *chosenCardTexture = NULL;
@@ -330,21 +347,39 @@ int main() {
 			currCard = currCard->next;
 		}
 
+		// Score board
+		SDL_RenderTexture(renderer, scoreTexture, NULL, &scoreRendRect);
+
+		// Score numbers
+		int numSize = 0;
 		tempScore = score;
-		int counter0 = 10;
 		do {
-			numRendRect.x = counter0 * (NUMBER_W + 10);
-			numRendRect.y = 0;
+			numSize++;
+			tempScore /= 10;
+		} while (tempScore != 0);
+
+		tempScore = score;
+		int counter0 = numSize;
+		do {
+			numRendRect.x = NUM_OFF_X + counter0 * (NUMBER_W + 10);
+			numRendRect.y = NUM_OFF_Y;
 			SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
 			counter0--;
 			tempScore /= 10;
 		} while (tempScore != 0);
 
+		numSize = 0;
 		tempScore = hiScore;
-		counter0 = 10;
 		do {
-			numRendRect.x = counter0 * (NUMBER_W + 10);
-			numRendRect.y = NUMBER_H + 10;
+			numSize++;
+			tempScore /= 10;
+		} while (tempScore != 0);
+
+		tempScore = hiScore;
+		counter0 = numSize;
+		do {
+			numRendRect.x = NUM_OFF_X + counter0 * (NUMBER_W + 10);
+			numRendRect.y = NUM_OFF_Y + NUMBER_H + 10;
 			SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
 			counter0--;
 			tempScore /= 10;
@@ -356,6 +391,8 @@ int main() {
 
     // Everything to the trash bin
 	SDL_DestroyTexture(bgTexture);
+
+	SDL_DestroyTexture(scoreTexture);
 
 	SDL_DestroyTexture(nullCardTexture);
 
