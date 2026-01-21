@@ -168,6 +168,13 @@ int main() {
 
 	SDL_FPoint mousePosition = {0, 0};
 
+	SDL_FRect bgRect = {
+		0,
+		0,
+		SCREEN_W,
+		SCREEN_H
+	};
+
 	SDL_FRect numRendRect = {
 		0,
 		0,
@@ -337,12 +344,14 @@ int main() {
 			scoreRendRect.y = lerpV((SDL_FPoint){0, scoreRendRect.y}, (SDL_FPoint){0, SCORE_Y}, 0.2).y;
 		}
 
-        // Clear the screen
-        SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-        SDL_RenderClear(renderer);
-
 		// Background
 		SDL_RenderTexture(renderer, bgTexture, NULL, NULL);
+
+        // Fill the screen with a colour
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
+        SDL_SetRenderDrawColor(renderer, 0xff, 0x27, 0x00, 0xff);
+        SDL_RenderFillRect(renderer, &bgRect);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
 		// Render the cards
 		for (int i=0; i<5; i++) SDL_RenderTexture(renderer, playerCards[i].texture, NULL, &playerCards[i].rect);
