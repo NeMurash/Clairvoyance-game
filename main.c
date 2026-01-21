@@ -35,7 +35,8 @@
 #define MAX_ANS_CARDS 15
 
 // Milliseconds
-#define START_DELAY  500
+#define START_DELAY  1000
+#define SCORE_DELAY  900
 #define PCARDS_DELAY 500
 
 // Go figure
@@ -163,6 +164,7 @@ int main() {
 
     int lastTicks = SDL_GetTicks();
     float deltaTime __attribute__((unused)) = 0;
+	Uint64 ticks;
 
 	SDL_FPoint mousePosition = {0, 0};
 
@@ -174,7 +176,7 @@ int main() {
 	};
 	SDL_FRect scoreRendRect = {
 		SCORE_X,
-		SCORE_Y,
+		-256,
 		SCORE_W,
 		SCORE_H
 	};
@@ -252,7 +254,7 @@ int main() {
 		// Game state handling
 		switch (gameState) {
 			case STATE_STARTING:
-				Uint64 ticks = SDL_GetTicks();
+				ticks = SDL_GetTicks();
 				if (ticks > PCARDS_DELAY)
 					for (int i=0; i<5; i++)
 						playerCards[i].targetPosition = STWCoords((SDL_FPoint){(i - 2) * PCARD_OFF_X, PCARD_REG_Y}, SCREEN_RES);
@@ -330,6 +332,10 @@ int main() {
 			currCard = currCard->next;
 		}
 
+		if (ticks > SCORE_DELAY) {
+			scoreRendRect.y = lerpV((SDL_FPoint){0, scoreRendRect.y}, (SDL_FPoint){0, SCORE_Y}, 0.2).y;
+		}
+
         // Clear the screen
         SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderClear(renderer);
@@ -351,39 +357,41 @@ int main() {
 		SDL_RenderTexture(renderer, scoreTexture, NULL, &scoreRendRect);
 
 		// Score numbers
-		int numSize = 0;
-		tempScore = score;
-		do {
-			numSize++;
-			tempScore /= 10;
-		} while (tempScore != 0);
+		if (gameState != STATE_STARTING) {
+			int numSize = 0;
+			tempScore = score;
+			do {
+				numSize++;
+				tempScore /= 10;
+			} while (tempScore != 0);
 
-		tempScore = score;
-		int counter0 = numSize;
-		do {
-			numRendRect.x = NUM_OFF_X + counter0 * (NUMBER_W + 10);
-			numRendRect.y = NUM_OFF_Y;
-			SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
-			counter0--;
-			tempScore /= 10;
-		} while (tempScore != 0);
+			tempScore = score;
+			int counter0 = numSize;
+			do {
+				numRendRect.x = NUM_OFF_X + counter0 * (NUMBER_W + 10);
+				numRendRect.y = NUM_OFF_Y;
+				SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
+				counter0--;
+				tempScore /= 10;
+			} while (tempScore != 0);
 
-		numSize = 0;
-		tempScore = hiScore;
-		do {
-			numSize++;
-			tempScore /= 10;
-		} while (tempScore != 0);
+			numSize = 0;
+			tempScore = hiScore;
+			do {
+				numSize++;
+				tempScore /= 10;
+			} while (tempScore != 0);
 
-		tempScore = hiScore;
-		counter0 = numSize;
-		do {
-			numRendRect.x = NUM_OFF_X + counter0 * (NUMBER_W + 10);
-			numRendRect.y = NUM_OFF_Y + NUMBER_H + 10;
-			SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
-			counter0--;
-			tempScore /= 10;
-		} while (tempScore != 0);
+			tempScore = hiScore;
+			counter0 = numSize;
+			do {
+				numRendRect.x = NUM_OFF_X + counter0 * (NUMBER_W + 10);
+				numRendRect.y = NUM_OFF_Y + NUMBER_H + 10;
+				SDL_RenderTexture(renderer, numberTextures[tempScore % 10], NULL, &numRendRect);
+				counter0--;
+				tempScore /= 10;
+			} while (tempScore != 0);
+		}
 
         // Render everything
         SDL_RenderPresent(renderer);
