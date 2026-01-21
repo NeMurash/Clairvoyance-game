@@ -64,7 +64,7 @@ int main() {
 
     if (window == NULL || renderer == NULL) return 1;
 
-	srand(time(NULL));
+	srand(time(0));
 
 	// Start of the actual thing 👀
 
