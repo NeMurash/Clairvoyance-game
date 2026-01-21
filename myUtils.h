@@ -12,6 +12,8 @@ SDL_FPoint STWCoords(SDL_FPoint point, SDL_FPoint minmax);
 SDL_FPoint lerpV(SDL_FPoint v0, SDL_FPoint v1, float t);
 // Check if a point is inside of a rectangular region
 bool pointInRect(SDL_FPoint pt, SDL_FRect rect);
+// Convert a hex character into an integer
+int h2i(char c);
 
 // Structs
 struct Card {
@@ -62,6 +64,38 @@ bool pointInRect(SDL_FPoint pt, SDL_FRect rect) {
 		(pt.y > rect.y && pt.y < rect.y + rect.h))
 		return true;
 	return false;
+}
+
+int h2i(char c) {
+	int res = -1;
+
+	if ('0' <= c && c <= '9') {
+		return (int) (c - '0');
+	}
+
+	switch (c) {
+		case 'a':
+			res = 10;
+			break;
+		case 'b':
+			res = 11;
+			break;
+		case 'c':
+			res = 12;
+			break;
+		case 'd':
+			res = 13;
+			break;
+		case 'e':
+			res = 14;
+			break;
+		case 'f':
+			res = 15;
+			break;
+		default: res = -1; break;
+	}
+
+	return res;
 }
 
 #endif

@@ -67,6 +67,22 @@ int main() {
 	srand(time(NULL));
 
 	// Start of the actual thing 👀
+
+	char bgColourBuffer[7];
+	int bgColourBufferCount = 0;
+	bgColourBuffer[6] = '\0';
+	FILE *bgConfFile = fopen("config/background.conf", "r");
+	fread(bgColourBuffer, sizeof(char), 7, bgConfFile);
+	fclose(bgConfFile);
+
+	int bgColours[3];
+
+	for (int i=0; i<3; i++) {
+		bgColours[i]  = h2i(bgColourBuffer[bgColourBufferCount]) * 16;
+		bgColours[i] += h2i(bgColourBuffer[bgColourBufferCount + 1]);
+		bgColourBufferCount += 2;
+	}
+
 	enum {
 		STATE_STARTING,
 		STATE_CHOOSING,
@@ -349,7 +365,7 @@ int main() {
 
         // Fill the screen with a colour
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MUL);
-        SDL_SetRenderDrawColor(renderer, 0xff, 0x27, 0x00, 0xff);
+        SDL_SetRenderDrawColor(renderer, bgColours[0], bgColours[1], bgColours[2], 0xff);
         SDL_RenderFillRect(renderer, &bgRect);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
