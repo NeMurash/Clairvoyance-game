@@ -176,7 +176,7 @@ int main() {
 	};
 	SDL_FRect scoreRendRect = {
 		SCORE_X,
-		-256,
+		-256, // Off screen
 		SCORE_W,
 		SCORE_H
 	};
@@ -287,6 +287,7 @@ int main() {
 					STWCoords((SDL_FPoint){0, -2}, SCREEN_RES),
 					(SDL_FRect) {0, 0, CARD_W, CARD_H}
 				};
+				// Random horizontal offset :3
 				cardLast->next->card.targetPosition.x = STWCoords((SDL_FPoint){(float)(rand() % 100 + 1 - 50) / 100.0 * ANSWC_RAND_OFF_X, 0.0}, SCREEN_RES).x;
 				cardLast->next->rotation = (rand() % ((MAX_CARD_ROT * 2) + 1)) - MAX_CARD_ROT;
 				cardLast->next->prev = cardLast;
