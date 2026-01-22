@@ -10,7 +10,7 @@ I got the inspiration to make this from stumbling upon this extrasensory test th
 
 ## Building / Compiling the game
 
-Building this project makes use of the GCC compiler and a Makefile through which the compiler is invoked.
+Building this project makes use of the GCC compiler and a [Makefile](/Makefile) through which the compiler is invoked.
   
 To build the project, first, cd into the project folder with your terminal emulator and make use of these commands:  
 - `make` to create an executable file.  
