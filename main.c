@@ -49,7 +49,7 @@ int main() {
     SDL_Window* window;
     SDL_Renderer* renderer;
 
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     window = SDL_CreateWindow(
         "Hello hi",
@@ -210,6 +210,16 @@ int main() {
 	int hiScore   = 0;
 	int tempScore = 0;
 
+	SDL_AudioSpec    spec;
+
+	Uint8 *selectWav;
+	Uint32 selectLen = 0;
+	SDL_LoadWAV("sounds/select.wav", &spec, &selectWav, &selectLen);
+
+	SDL_AudioStream *audioStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, NULL, NULL);
+
+	SDL_ResumeAudioStreamDevice(audioStream);
+
     while (!windowShouldClose) {
         // Limit the FPS I think
 		if (SDL_GetTicks() - lastTicks < 1000 / TARGET_FPS) continue;
@@ -334,6 +344,9 @@ int main() {
 				}
 				else score = 0;
 
+				SDL_ClearAudioStream(audioStream);
+				SDL_PutAudioStreamData(audioStream, selectWav, selectLen);
+
 				gameState = STATE_ANSWER;
 				break;
 			case STATE_ANSWER:
@@ -447,6 +460,9 @@ int main() {
 
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
+
+	SDL_DestroyAudioStream(audioStream);
+
     SDL_Quit();
 
     return 0;
